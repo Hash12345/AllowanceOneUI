@@ -26,6 +26,12 @@ class CreateNewUser implements CreatesNewUsers
     {
         Validator::make($input, [
             'name' => ['required', 'string', 'max:255'],
+            'first_name' => ['required', 'string', 'max:255'],
+            'middle_name' => ['required', 'string', 'max:255'],
+            'last_name' => ['required', 'string', 'max:255'],
+            'employee_id' => ['required'],
+            'job_title' => ['required'],
+            'salary' => ['required'],
             'email' => [
                 'required',
                 'string',
@@ -39,6 +45,12 @@ class CreateNewUser implements CreatesNewUsers
         return User::create([
             'name' => $input['name'],
             'email' => $input['email'],
+            'employee_id' => $input['employee_id'],
+            'first_name' => $input['first_name'],
+            'middle_name' => $input['middle_name'],
+            'last_name' => $input['last_name'],
+            'job_title' => $input['job_title'],
+            'salary' => $input['salary'],
             'password' => Hash::make($input['password']),
         ]);
     }

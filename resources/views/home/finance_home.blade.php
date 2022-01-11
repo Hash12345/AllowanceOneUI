@@ -16,8 +16,8 @@
                 <div class="block block-rounded d-flex flex-column">
                     <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
                         <dl class="mb-0">
-                            <dt id="dtpending" class="font-size-h2 font-w700">{{ $pending }}</dt>
-                            <dd class="text-muted mb-0">pending Allowances</dd>
+                            <dt id="dttotal" class="font-size-h2 font-w700">$ {{ number_format( $suspense_sum + $reimbursed_sum) }}</dt>
+                            <dd class="text-muted mb-0">Used Budget</dd>
                         </dl>
                         <div class="item item-rounded bg-body">
                             <i class="fa fa-shopping-cart font-size-h3 text-primary"></i>
@@ -36,8 +36,8 @@
                 <div class="block block-rounded d-flex flex-column">
                     <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
                         <dl class="mb-0">
-                            <dt id="dtrejected" class="font-size-h2 font-w700">{{ $rejected }}</dt>
-                            <dd class="text-muted mb-0">rejected Allowances</dd>
+                            <dt id="dtsuspense" class="font-size-h2 font-w700">$ {{number_format($suspense_sum)}}</dt>
+                            <dd class="text-muted mb-0">Suspense Amount</dd>
                         </dl>
                         <div class="item item-rounded bg-body">
                             <i class="fa fa-ban font-size-h3 text-primary"></i>
@@ -56,8 +56,8 @@
                 <div class="block block-rounded d-flex flex-column">
                     <div class="block-content block-content-full flex-grow-1 d-flex justify-content-between align-items-center">
                         <dl class="mb-0">
-                            <dt id="dtaccepted" class="font-size-h2 font-w700">{{ $accepted }}</dt>
-                            <dd class="text-muted mb-0">accepted allowances</dd>
+                            <dt id="dtreimbursed" class="font-size-h2 font-w700">$ {{number_format ($reimbursed_sum)}}</dt>
+                            <dd class="text-muted mb-0">Reimbursed Amount</dd>
                         </dl>
                         <div class="item item-rounded bg-body">
                             <i class="fa fa-check font-size-h3 text-primary"></i>
@@ -105,10 +105,7 @@
                 @endif
                 <div class="block block-rounded">
                     <div class="block-header border-bottom">
-                        <h3 id="message" class="block-title">Pending Employee Allowances</h3>
-                        <div class="block-options">
-                            <a href="{{ route('allowances.create')}}" class="btn btn-sm btn-outline-primary"><i class="fa fa-plus"></i> Create Allowance</a>
-                        </div>
+                        <h3 id="message" class="block-title">Pending Allowances Payments</h3>
                     </div>
                     <div class="block-content block-content-full">
                         <table id="tblAllowances" class="table table-bordered table-striped table-vcenter dataTable no-footer ">
@@ -118,8 +115,9 @@
                                     <th class="d-none d-sm-table-cell" style="width: 30%;">ስም</th>
                                     <th>ቦታ</th>
                                     <th class="" style="">ቀን</th>
-                                    <th class="" style="">የቆይታ ጊዜ /ቀን/</th>
-                                    <th class="" style="width: 15%;">Status</th>
+                                    <th class="" style="">የሚቆይበት የቀን ብዛት /ቀን/</th>
+                                    <th class="" style="">የአበል መጠን /ብር</th>
+                                    <th class="" style="width: 15%;">Action</th>
                                 </tr>
                             </thead>
                             <tbody>                               
@@ -202,11 +200,11 @@
 @endsection
 @section('scripts')
     <script>   
-        function approveAllowance(id){
+        function approvePayment(id){
             $("#modal-accept").modal('show')
             $("#btnaccept").data('id', id)
         }   
-        function rejectAllowance(id){
+        function rejectPayment(id){
             $("#modal-reject").modal('show')
             $("#btnreject").data('id', id)
         }
@@ -214,13 +212,14 @@
             let allowanceTable = $('#tblAllowances').DataTable({
                 processing: true,
                 serverSide: true,
-                ajax: "{{ route('home.head') }}",
+                ajax: "{{ route('home.finance') }}",
                 columns: [
                     {data: 'id', name: 'id'},
                     {data: 'user_id', name: 'user_id'},
                     {data: 'target_location', name: 'target_location'},
                     {data: 'start_date', name: 'start_date'},
                     {data: 'days_count', name: 'days_count'},
+                    {data: 'amount', name: 'amount'},
                     {data: 'action', name: 'action', orderable: false, searchable: false},
 
                 ],
@@ -229,7 +228,7 @@
 
             //accept Allowance
             $("#btnaccept").on("click", function(){
-                let _url="{{ route('allowance.approve')}}"
+                let _url="{{ route('allowance.approve.payment')}}"
                 let _token=$("meta[name='csrf-token']").attr("content")
                 $.ajax({
                     type:"POST",
@@ -241,16 +240,17 @@
                     },
                     success:function(response){
                         $("#modal-accept").modal("hide")
-                        $("#dtpending").text(response.pending)
-                        $("#dtrejected").text(response.rejected)
-                        $("#dtaccepted").text(response.accepted)
+                        $('#messageAccept').val('')
+                        $("#dttotal").text('$' + (response.suspense_sum + response.reimbursed_sum).toFixed(2) )
+                        $("#dtreimbursed").text('$' + (response.reimbursed_sum).toFixed(2))
+                        $("#dtsuspense").text('$' + (response.suspense_sum).toFixed(2))
                         allowanceTable.ajax.reload();
                     }
                 })
             })
             //reject Allowance
             $("#btnreject").on("click", function(){
-                let _url="{{ route('allowance.reject')}}"
+                let _url="{{ route('allowance.reject.payment')}}"
                 let _token=$("meta[name='csrf-token']").attr("content")
                 $.ajax({
                     type:"POST",
@@ -262,9 +262,10 @@
                     },
                     success:function(response){
                         $("#modal-reject").modal("hide")
-                        $("#dtpending").text(response.pending)
-                        $("#dtrejected").text(response.rejected)
-                        $("#dtaccepted").text(response.accepted)
+                        $('#messageReject').val('')
+                        $("#dttotal").text('$' + (response.suspense_sum + response.reimbursed_sum).toFixed(2) )
+                        $("#dtreimbursed").text('$' + (response.reimbursed_sum).toFixed(2))
+                        $("#dtsuspense").text('$' + (response.suspense_sum).toFixed(2))
                         allowanceTable.ajax.reload();
                     }
                 })

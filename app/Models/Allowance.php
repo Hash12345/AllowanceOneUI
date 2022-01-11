@@ -45,6 +45,9 @@ class Allowance extends Model
     public function approvedBy(){
         return $this->belongsTo(User::class, 'approved_by');
     }
+    public function paidBy(){
+        return $this->belongsTo(User::class, 'paid_by');
+    }
     public function getTravelsSumAttribute(){
         $travelPayment=0;
         foreach($this->travelAllowances as $travelAllowance){

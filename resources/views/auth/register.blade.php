@@ -78,6 +78,43 @@
                                                     @enderror 
                                                     </div>
                                                     <div class="form-group">
+                                                        <input type="text" class="form-control form-control-lg form-control-alt" id="employee_id" name="employee_id" placeholder="Employee Id" value="{{ old('employee_id')}}">
+                                                        @error('employee_id')
+                                                            <div class="text-danger">{{ $message }}</div>    
+                                                        @enderror                    
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <input type="text" class="form-control form-control-lg form-control-alt" id="first_name" name="first_name" placeholder="First Name" value="{{ old('first_name')}}">
+                                                        @error('first_name')
+                                                            <div class="text-danger">{{ $message }}</div>    
+                                                        @enderror                    
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <input type="text" class="form-control form-control-lg form-control-alt" id="middle_name" name="middle_name" placeholder="Middle Name" value="{{ old('middle_name')}}">
+                                                        @error('middle_name')
+                                                            <div class="text-danger">{{ $message }}</div>    
+                                                        @enderror                    
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <input type="text" class="form-control form-control-lg form-control-alt" id="last_name" name="last_name" placeholder="Last Name" value="{{ old('last_name')}}">
+                                                        @error('last_name')
+                                                            <div class="text-danger">{{ $message }}</div>    
+                                                        @enderror                    
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <input type="text" class="form-control form-control-lg form-control-alt" id="job_title" name="job_title" placeholder="Job Title" value="{{ old('job_title')}}">
+                                                        @error('job_title')
+                                                            <div class="text-danger">{{ $message }}</div>    
+                                                        @enderror                    
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <input type="number" class="form-control form-control-lg form-control-alt" id="salary" name="salary" placeholder="Salary" value="{{ old('salary')}}">
+                                                        @error('salary')
+                                                            <div class="text-danger">{{ $message }}</div>    
+                                                        @enderror                    
+                                                    </div>
+                                                    
+                                                    <div class="form-group">
                                                         <input type="password" class="form-control form-control-lg form-control-alt" id="password" name="password" placeholder="Password">
                                                         @error('password')
                                                         <div class="text-danger">{{ $message }}</div>    

@@ -23,10 +23,16 @@ use Illuminate\Support\Facades\Route;
 */
 //Dashboard
 Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard')->middleware('auth');
+
+//Main URL
+Route::get('/', function(){
+    return redirect('/home');
+});
 // Home
 Route::get('/home', [HomeController::class, 'index'])->name('home')->middleware('auth');
 Route::get('/home/user-home-ajax', [HomeController::class, 'user_home_ajax'])->name('home.user')->middleware('auth');
 Route::get('/home/head-home-ajax', [HomeController::class, 'head_home_ajax'])->name('home.head')->middleware('auth');
+Route::get('/home/finance-home-ajax', [HomeController::class, 'finance_home_ajax'])->name('home.finance')->middleware('auth');
 Route::get('/home/head-home-rejected-ajax', [HomeController::class, 'head_home_rejected_ajax'])->name('home.rejected.head')->middleware('auth');
 Route::get('/home/head-home-accepted-ajax', [HomeController::class, 'head_home_accepted_ajax'])->name('home.accepted.head')->middleware('auth');
 Route::get('/home/user-home-rejected-ajax', [HomeController::class, 'user_home_rejected_ajax'])->name('home.rejected.user')->middleware('auth');
@@ -43,6 +49,11 @@ Route::resource('/allowances', AllowanceController::class)->middleware('auth');
 //approve and reject allowance
 Route::post('/allowance/approve', [AllowanceController::class, 'acceptAllowance'])->name('allowance.approve')->middleware('auth');
 Route::post('/allowance/reject', [AllowanceController::class, 'rejectAllowance'])->name('allowance.reject')->middleware('auth');
+
+//approve and reject allowance by finance
+Route::post('/allowance/approve-finance', [AllowanceController::class, 'approveAllowanceFinance'])->name('allowance.approve.payment')->middleware('auth');
+Route::post('/allowance/reject-finance', [AllowanceController::class, 'rejectAllowanceFinance'])->name('allowance.reject.payment')->middleware('auth');
+
 
 
 Route::resource('/cities', CityController::class);

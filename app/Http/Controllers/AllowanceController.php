@@ -333,7 +333,7 @@ class AllowanceController extends Controller
             $allowance->approved_by=auth()->user()->id;
             $allowance->approved_date=Carbon::now();
             $allowance->message=$request->message;
-            $allowance->reimbursed=1;
+            //$allowance->reimbursed=1;
             $allowance->save(); 
             $pending= Allowance::where('status', 0)->count();
             $accepted=Allowance::where('status', 2)->where('approved_by', auth()->user()->id)->count();
@@ -354,6 +354,52 @@ class AllowanceController extends Controller
             $accepted=Allowance::where('status', 2)->where('approved_by', auth()->user()->id)->count();
             $rejected=Allowance::where('status', 1)->where('approved_by', auth()->user()->id)->count();
             return response()->json(['success'=>true, 'allowance'=>$allowance, 'pending'=>$pending, 'accepted'=>$accepted, 'rejected'=>$rejected]);       
+        }
+    }
+    //approve allowance by finance_officer
+    public function approveAllowanceFinance(Request $request){
+        if(auth()->user()->role == 'finance'){
+            $allowance = Allowance::findOrFail($request->id);
+            $allowance->payment_status=2;
+            $allowance->paid_by=auth()->user()->id;
+            $allowance->payment_date=Carbon::now();
+            $allowance->finance_message=$request->message;
+            $allowance->reimbursed=1;
+            $allowance->save(); 
+            $su= Allowance::where('reimbursed', 0)->get();
+            $re= Allowance::where('reimbursed', 1)->get();
+            $suspense_sum=0;
+            $reimbursed_sum=0;
+            foreach($su as $a){
+                $suspense_sum += $a->trip_allowance;
+            }
+            foreach($re as $a){
+                $reimbursed_sum += $a->trip_allowance;
+            }
+
+            return response()->json(['success'=>true, 'allowance'=>$allowance, 'suspense_sum'=>$suspense_sum, 'reimbursed_sum'=>$reimbursed_sum]);
+        }
+    }
+    //reject allowance by finance_officer
+    public function rejectAllowanceFinance(Request $request){
+        if(auth()->user()->role == 'finance'){
+            $allowance = Allowance::findOrFail($request->id);
+            $allowance->payment_status=1;
+            $allowance->paid_by=auth()->user()->id;
+            $allowance->payment_date=Carbon::now();
+            $allowance->finance_message=$request->message;
+            $allowance->save(); 
+            $su= Allowance::where('reimbursed', 0)->get();
+            $re= Allowance::where('reimbursed', 1)->get();
+            $suspense_sum=0;
+            $reimbursed_sum=0;
+            foreach($su as $a){
+                $suspense_sum += $a->trip_allowance;
+            }
+            foreach($re as $a){
+                $reimbursed_sum += $a->trip_allowance;
+            }
+            return response()->json(['success'=>true, 'allowance'=>$allowance, 'suspense_sum'=>$suspense_sum, 'reimbursed_sum'=>$reimbursed_sum]);
         }
     }
 }
